@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Churn Analysis</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'predictor/css/chart.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: clamp(1.8em, 5vw, 2.5em);
+            word-wrap: break-word;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            margin-top: 10px;
+        }
+        
+        .result-container {
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .chart-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            color: #004085;
+            border-left: 4px solid #667eea;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+            
+            .container {
+                padding: 25px 20px;
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+                margin-bottom: 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            label {
+                font-size: 1em;
+            }
+            
+            .btn {
+                padding: 12px 30px;
+                font-size: 1.1em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 5px;
+            }
+            
+            .container {
+                padding: 20px 15px;
+                border-radius: 10px;
+            }
+            
+            h1 {
+                font-size: 1.6em;
+            }
+            
+            .info, .error {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+            
+            input[type="number"] {
+                padding: 10px 12px;
+                font-size: 0.95em;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Customer Churn Analysis</h1>
+        
+        <div class="info">
+            <strong>ℹ️ Information:</strong> Enter an age range to analyze customer churn status (Stayed vs Left) for that demographic.
+        </div>
+        
+        {% if error %}
+        <div class="error">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="start_age">Starting Age:</label>
+                <input type="number" id="start_age" name="start_age" min="1" max="120" required placeholder="e.g., 25">
+            </div>
+            
+            <div class="form-group">
+                <label for="end_age">Ending Age:</label>
+                <input type="number" id="end_age" name="end_age" min="1" max="120" required placeholder="e.g., 41">
+            </div>
+            
+            <button type="submit" class="btn">Generate Analysis 🔍</button>
+        </form>
+        
+        <a href="{% url 'train' %}">
+            <button class="btn btn-secondary">← Back to Training</button>
+        </a>
+        
+        {% if chart_data %}
+        <div class="result-container">
+            <h2 style="color: #667eea; margin-bottom: 20px;">Analysis Results</h2>
+            <div class="chart-container">
+                <h3 class="chart-title">Customer Status for Age {{ start_age }} to {{ end_age }}</h3>
+                <div class="canvas-wrapper">
+                    <canvas id="pieChart"></canvas>
+                </div>
+                <div class="chart-legend"></div>
+            </div>
+        </div>
+        
+        <script src="{% static 'predictor/js/chart.js' %}"></script>
+        <script>
+            const chartData = {{ chart_data|safe }};
+            const labels = chartData.labels;
+            const values = chartData.values;
+            const startAge = {{ start_age }};
+            const endAge = {{ end_age }};
+            
+            // Store globally for resize handler
+            window.chartDataGlobal = { labels, values, startAge, endAge };
+            
+            // Draw chart when page loads
+            drawPieChart(labels, values, startAge, endAge);
+        </script>
+        {% endif %}
+    </div>
+</body>
+</html>
