@@ -21,6 +21,9 @@
     max-width: 500px;
     margin: 0 auto;
     aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #pieChart {
@@ -114,5 +117,11 @@
     
     .legend-item {
         font-size: 0.85rem;
+        justify-content: center;
+    }
+    
+    .legend-color {
+        width: 16px;
+        height: 16px;
     }
 }

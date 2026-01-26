@@ -17,7 +17,10 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .container {
@@ -26,8 +29,8 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 40px;
             max-width: 900px;
-            margin: 0 auto;
             width: 100%;
+            margin: 0 auto;
         }
         
         h1 {
@@ -38,8 +41,15 @@
             word-wrap: break-word;
         }
         
-        .form-group {
+        .form-row {
+            display: flex;
+            gap: 20px;
             margin-bottom: 25px;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 0; /* Allow flex items to shrink below content size */
         }
         
         label {
@@ -48,6 +58,7 @@
             font-weight: bold;
             margin-bottom: 8px;
             font-size: 1.1em;
+            white-space: nowrap;
         }
         
         input[type="number"] {
@@ -74,7 +85,9 @@
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
             width: 100%;
-            margin-top: 20px;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
         }
         
         .btn:hover {
@@ -85,6 +98,7 @@
         .btn-secondary {
             background: #6c757d;
             margin-top: 10px;
+            max-width: 200px;
         }
         
         .result-container {
@@ -123,36 +137,7 @@
         }
         
         /* Responsive styles */
-        @media (max-width: 768px) {
-            body {
-                padding: 20px 10px;
-            }
-            
-            .container {
-                padding: 25px 20px;
-                border-radius: 15px;
-            }
-            
-            h1 {
-                font-size: 2em;
-                margin-bottom: 20px;
-            }
-            
-            .form-group {
-                margin-bottom: 20px;
-            }
-            
-            label {
-                font-size: 1em;
-            }
-            
-            .btn {
-                padding: 12px 30px;
-                font-size: 1.1em;
-            }
-        }
-        
-        @media (max-width: 480px) {
+        @media (max-width: 400px) {
             body {
                 padding: 15px 5px;
             }
@@ -199,14 +184,16 @@
         
         <form method="POST">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="start_age">Starting Age:</label>
-                <input type="number" id="start_age" name="start_age" min="1" max="120" required placeholder="e.g., 25">
-            </div>
-            
-            <div class="form-group">
-                <label for="end_age">Ending Age:</label>
-                <input type="number" id="end_age" name="end_age" min="1" max="120" required placeholder="e.g., 41">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start_age">Starting Age:</label>
+                    <input type="number" id="start_age" name="start_age" min="1" max="120" required placeholder="e.g., 25">
+                </div>
+                
+                <div class="form-group">
+                    <label for="end_age">Ending Age:</label>
+                    <input type="number" id="end_age" name="end_age" min="1" max="120" required placeholder="e.g., 41">
+                </div>
             </div>
             
             <button type="submit" class="btn">Generate Analysis 🔍</button>
